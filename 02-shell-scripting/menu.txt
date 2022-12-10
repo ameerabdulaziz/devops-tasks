@@ -1,0 +1,6 @@
+press i to add new contact
+press v to view all contacts
+press s to search for record
+press e to delete all contacts
+press d to delete one contact
+press q to exit
