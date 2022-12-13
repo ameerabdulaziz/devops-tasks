@@ -65,7 +65,7 @@ search_for_contact () {
 
 # Delete all contacts
 delete_all_contacts () {
-	> $CONTACTS_DATABASE
+	sed -i d $CONTACTS_DATABASE
 	echo "All Contacts are deleted!"
 }
 
@@ -73,7 +73,7 @@ delete_all_contacts () {
 # Delete specific contact
 delete_contact () {
 	read -p "Please enter pattern related to contact you want to delete " pattern
-	grep -v $pattern contacts.txt > contacts.txt.tmp && mv contacts.txt.tmp contacts.txt
+	sed -i "/$pattern/d" $CONTACTS_DATABASE
 	echo "$pattern contact is deleted!"
 }
 
@@ -118,25 +118,25 @@ choose_feature () {
 			      	show_decoration 42 "="
 			      	if choose_option == 0; then break; fi
 			      	;;
-			    s)
+			s)
 			      	search_for_contact
 			      	show_decoration 42 "="
 			      	if choose_option == 0; then break; fi
 			      	;;
-			    e)
+			e)
 			      	delete_all_contacts
 			      	show_decoration 42 "="
 			      	if choose_option == 0; then break; fi
 			      	;;
-			    d)
+			d)
 			      	delete_contact
 			      	show_decoration 42 "="
 			      	if choose_option == 0; then break; fi
 			      	;;
-			    q)
+			q)
 			      	break
 			      	;;
-			    *)
+			*)
 			      	echo -e "\n$feature is not one of our features, please try again!\n\n"
 			      	;;
 		esac
@@ -146,8 +146,8 @@ choose_feature () {
 
 # Run main Contacts Program
 main () {
-  show_decoration 31 "*"
-  show_welcome_message
+	show_decoration 31 "*"
+	show_welcome_message
 	show_decoration 31 "*"
 	choose_feature
 	show_decoration 40 "*"
