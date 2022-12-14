@@ -22,14 +22,24 @@ show_exit_message () {
 # $1 is the number of loops
 # $2 is the symbol that will be printed.
 show_decoration () {
-	for ((i = 0; i<$1; i++)); do echo -n "$2"; done
-	echo
+	if [ "$2" = - ]; then
+		printf -- "$2%.0s" $(seq $1); printf "\n"
+	else
+		printf "$2%.0s" $(seq $1); printf "\n"
+	fi
+}
+
+
+# Read file and show its content
+# $1 is the file name
+read_file_show_content () {
+	awk '$0' $1
 }
 
 
 # Read "menu.txt" file which include all features of Contacts Program and print them line by line to the user
 show_menu () {
-	while read line; do echo "$line"; done < menu.txt
+	read_file_show_content menu.txt
 }	
 
 
@@ -48,9 +58,9 @@ view_all_contacts () {
 	# Check file size if it is greater than 0 bytes will read file content or print no contacts message
 	if [ -s $CONTACTS_DATABASE ]
 	then
-		while read contact; do echo "$contact"; done < "$CONTACTS_DATABASE"
+		read_file_show_content $CONTACTS_DATABASE
 	else
-	  echo "No contacts are added yet"
+		echo "No contacts are added yet"
 	fi
 }
 
@@ -58,8 +68,7 @@ view_all_contacts () {
 # Search for contact inside 'contacts.txt' file
 search_for_contact () {
 	read -p "Please enter pattern related to contact you want to search for " pattern
-	contact=$(grep -i $pattern $CONTACTS_DATABASE)
-	echo "$contact"
+	awk -v pat=$pattern '$0~pat' $CONTACTS_DATABASE
 }
 
 
@@ -78,6 +87,14 @@ delete_contact () {
 }
 
 
+# Show warning input message
+show_warning_message () {
+	show_decoration 65 '!'
+	printf "WARNING - $1 is not one of the above $2, please try again!\n"
+	show_decoration 65 '!'
+}
+
+
 # Ask user to choose one of the option whether to continue in the program or exit
 choose_option () {
 	while :
@@ -91,7 +108,7 @@ choose_option () {
 				return 0
 				;;
 			*)
-				echo -e "\n\n$option is not one of our options, please try again!\n\n"
+				show_warning_message $option options
 				continue
 				;;
 		esac
@@ -137,7 +154,7 @@ choose_feature () {
 			      	break
 			      	;;
 			*)
-			      	echo -e "\n$feature is not one of our features, please try again!\n\n"
+				show_warning_message $feature features
 			      	;;
 		esac
 	done
